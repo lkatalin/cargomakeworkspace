@@ -1,0 +1,26 @@
+[env]
+CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = "true"
+CARGO_MAKE_WORKSPACE_EMULATION = true
+CARGO_MAKE_CRATE_WORKSPACE_MEMBERS = [
+        "membercrate1",
+        "membercrate2"
+]
+
+[tasks.cratetask]
+env = { "PWD" = { script = ["pwd"] } }
+command = "echo"
+args = ["This should print for each member crate: ${PWD}"]
+
+[tasks.crateflow]
+run_task = { name = "cratetask", fork = true }
+
+[tasks.topflow]
+workspace = false
+command = "echo"
+args = ["This should only print once at the top level."]
+
+[tasks.composite]
+dependencies = [
+    "topflow",
+    "crateflow"
+]
