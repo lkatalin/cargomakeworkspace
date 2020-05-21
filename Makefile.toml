@@ -8,14 +8,30 @@ CARGO_MAKE_CRATE_WORKSPACE_MEMBERS = [
 ]
 #CARGO_MAKE_WORKSPACE_SKIP_MEMBERS = ["member3"]
 
-[tasks.cratetask]
+[tasks.cratetask1and3]
 env = { "PWD" = { script = ["pwd"] } }
 command = "echo"
 args = ["This should print for each member crate: ${PWD}"]
 
-[tasks.crateflow]
+[tasks.cratetask2]
+env = { "PWD" = { script = ["pwd"] } }
+command = "echo"
+args = ["This should print ONLY for crate 2: ${PWD}"]
+
+[tasks.crateflow1and2]
+env = { "CARGO_MAKE_WORKSPACE_SKIP_MEMBERS" = "membercrate3" }
+run_task = { name = "cratetask1and3", fork = true }
+
+[tasks.crateflow1and3]
 env = { "CARGO_MAKE_WORKSPACE_SKIP_MEMBERS" = "membercrate2" }
-run_task = { name = "cratetask", fork = true }
+run_task = { name = "cratetask1and3", fork = true }
+
+[tasks.crateflow2]
+env = { "CARGO_MAKE_WORKSPACE_SKIP_MEMBERS" = "", "CARGO_MAKE_WORKSPACE_INCLUDE_MEMBERS" = "membercrate2" }
+run_task = { name = "cratetask2", fork = true }
+
+[tasks.crateflow]
+run_task = { name = ["crateflow1and3", "topflow", "crateflow2"] }
 
 [tasks.topflow]
 workspace = false
